@@ -51,7 +51,7 @@ def test03():
     # y = x**2
     x = torch.tensor(10, requires_grad=True, dtype=torch.float64, device="cuda")
     count = 0
-    for _ in range(50000):
+    for _ in range(5000):
         # 正向计算
         f = x**2
 
@@ -68,7 +68,7 @@ def test03():
 
             count += 1
             if count % 100 == 0:
-                print("%.10f" % x.data)
+                print(f"{x.data:.10f}")
 
 
 if __name__ == "__main__":
