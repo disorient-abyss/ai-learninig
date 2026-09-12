@@ -2,7 +2,7 @@ import copy
 
 import torch
 from decoder import Decoder, DecoderLayer
-from embedding import TransformerEmbedding
+from embedding import Embeddings, PositionalEncoding  # 1. 导入这两个基础组件
 from encoder import Encoder, EncoderLayer
 from forward_net import PositionwiseFeedForward
 from generator import Generator
@@ -17,8 +17,8 @@ class Transformer(nn.Module):
         self,
         encoder: Encoder,
         decoder: Decoder,
-        src_embed: TransformerEmbedding,
-        tgt_embed: TransformerEmbedding,
+        src_embed: nn.Sequential,
+        tgt_embed: nn.Sequential,
         generator: Generator,
     ):
         super().__init__()
@@ -89,9 +89,15 @@ def make_model(
         N=N,
     )
 
-    # 实例化 Embedding 与 Generator
-    src_embed = TransformerEmbedding(d_model=d_model, vocab_size=src_vocab, dropout=dropout, padding_idx=pad_idx)
-    tgt_embed = TransformerEmbedding(d_model=d_model, vocab_size=tgt_vocab, dropout=dropout, padding_idx=pad_idx)
+    # 2. 直接使用 nn.Sequential 组装嵌入层（与教学完全一致）
+    src_embed = nn.Sequential(
+        Embeddings(d_model=d_model, vocab_size=src_vocab, padding_idx=pad_idx),
+        PositionalEncoding(d_model=d_model, dropout=dropout),
+    )
+    tgt_embed = nn.Sequential(
+        Embeddings(d_model=d_model, vocab_size=tgt_vocab, padding_idx=pad_idx),
+        PositionalEncoding(d_model=d_model, dropout=dropout),
+    )
     generator = Generator(d_model=d_model, vocab_size=tgt_vocab)
 
     # 组装完整模型

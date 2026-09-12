@@ -42,6 +42,9 @@ if __name__ == "__main__":
         pad_idx=pad_idx,
     ).to(device)
 
+    # 打印模型查看
+    print(model)
+
     # 设置为评估模式（关闭 Dropout 随机失活）
     model.eval()
 

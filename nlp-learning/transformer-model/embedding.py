@@ -39,22 +39,3 @@ class PositionalEncoding(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x + self.pe[:, : x.size(1)]
         return self.dropout(x)
-
-
-class TransformerEmbedding(nn.Module):
-    """整合 Embeddings 与 PositionalEncoding 的高阶组件"""
-
-    def __init__(
-        self,
-        d_model: int,
-        vocab_size: int,
-        dropout: float = 0.1,
-        max_len: int = 5000,
-        padding_idx: int | None = None,
-    ):
-        super().__init__()
-        self.token_emb = Embeddings(d_model, vocab_size, padding_idx=padding_idx)
-        self.pe = PositionalEncoding(d_model, dropout=dropout, max_len=max_len)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.pe(self.token_emb(x))
