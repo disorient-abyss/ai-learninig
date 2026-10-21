@@ -1,0 +1,10 @@
+*.code-workspace
+.vscode
+.gitignore
+__pycache__/
+*.pyc
+*.pth
+*.pt
+*.bin
+fil9
+fil9.bin
