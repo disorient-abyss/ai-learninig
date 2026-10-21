@@ -1,0 +1,2 @@
+Qwen_API_KEY="sk-ws-H.EEYHYEX.qk7O.MEUCIQCRZPJuUUKk17-DZd_CdCkSTeypvr30XzrnGYnAAAUTBAIgfKTkFoOFX2A-ZSRawxgfg4HYAYP3dHGsp-K_yqLZOXY"
+Qwen_API_BASE="https://dashscope.aliyuncs.com/compatible-mode/v1"
