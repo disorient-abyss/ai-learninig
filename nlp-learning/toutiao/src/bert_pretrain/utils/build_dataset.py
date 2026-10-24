@@ -1,7 +1,9 @@
+import os
+
 from tqdm import tqdm
 
 
-def build_dataset(config):
+def build_dataset(config, only_test=False):
     # 直接在内部提取特殊 token，支持默认兜底
     cls_token = getattr(config.tokenizer, "cls_token", "[CLS]")
     sep_token = getattr(config.tokenizer, "sep_token", "[SEP]")
@@ -11,8 +13,12 @@ def build_dataset(config):
             pad_size: int = 32, 
         ) -> list[tuple[list[int], int, int, list[int]]]:
         contents = []
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"未找到数据集文件: {path}")
+
+        file_name = os.path.basename(path)
         with open(path, "r", encoding="utf-8") as f:
-            for line in tqdm(f, desc=f"Loading {path.split('/')[-1]}"):
+            for line in tqdm(f, desc=f"Loading {file_name}"):
                 line = line.strip()
                 if not line:
                     continue
@@ -65,7 +71,10 @@ def build_dataset(config):
 
         return contents
     
-
+    if only_test is True:
+        test = load_dataset(config.test_path, config.pad_size)
+        return None, None, test
+    
     train = load_dataset(config.train_path, config.pad_size)
     dev = load_dataset(config.dev_path, config.pad_size)
     test = load_dataset(config.test_path, config.pad_size)

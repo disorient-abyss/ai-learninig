@@ -3,10 +3,11 @@ import torch
 
 class DatasetIterater:
 
-  def __init__(self, dataset, batch_size, model_name="bert"):
+  def __init__(self, dataset, batch_size, model_name="bert", device="cpu"):
     self.dataset = dataset
     self.batch_size = batch_size
     self.model_name = model_name
+    self.device = device
 
     self.n_batches = len(dataset) // batch_size
     self.residue = len(dataset) % batch_size != 0
@@ -35,7 +36,7 @@ class DatasetIterater:
 
     start_idx = self.index * self.batch_size
     end_idx = min(start_idx + self.batch_size, len(self.dataset))
-    batch_slice = self.batches[start_idx:end_idx]
+    batch_slice = self.dataset[start_idx:end_idx]
 
     self.index += 1
     return self._to_tensor(batch_slice)
@@ -51,4 +52,4 @@ class DatasetIterater:
 
 
 def build_iterator(dataset, config):
-  return DatasetIterater(dataset, config.batch_size, config.model_name)
+  return DatasetIterater(dataset, config.batch_size, config.model_name, device=config.device)

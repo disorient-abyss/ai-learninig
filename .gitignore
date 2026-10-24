@@ -8,3 +8,23 @@ __pycache__/
 *.bin
 fil9
 fil9.bin
+
+# 忽略任何层级下的 data 文件及其内部所有内容
+**/data/
+**/data/**
+
+# 忽略任何层级下的 keys 文件夹及其内部所有内容
+**/keys/
+keys/
+
+# 忽略常见以 _key.txt 或 key.txt 结尾的密钥明文
+*key.txt
+*_key.txt
+*token.txt
+
+# 忽略通用环境配置与敏感凭据文件
+.env
+.env.*
+*.pem
+*.key
+*.cert

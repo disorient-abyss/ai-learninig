@@ -5,13 +5,13 @@ from importlib import import_module
 
 import numpy as np
 import torch
-from models.train_eval import test, train
 from utils.build_dataset import build_dataset
 from utils.build_iterator import build_iterator
+from utils.train_eval import test, train
 
 
 def set_seed(seed: int = 1) -> None:
-    """锁定所有随机种子，确保实验完全可复现"""
+    """锁定随机种子以保证训练可复现"""
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
@@ -24,7 +24,7 @@ def set_seed(seed: int = 1) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Chinese Text Classification")
+    parser = argparse.ArgumentParser(description="Chinese Text Classification - Train")
     parser.add_argument(
         "--model",
         type=str,
@@ -43,9 +43,15 @@ def main():
         default=1,
         help="Random seed for reproducibility (default: 1)",
     )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="cuda" if torch.cuda.is_available() else "cpu",
+        help="Target device (e.g., cuda, cuda:0, cpu)",
+    )
     args = parser.parse_args()
 
-    # 1. 固定全局随机种子
+    # 1. 固定随机种子
     set_seed(args.seed)
 
     # 2. 动态加载模型与配置模块
@@ -57,18 +63,27 @@ def main():
 
     config = model_module.Config(args.dataset)
 
-    # 3. 构建数据集与批次迭代器
+    # 规范化设备参数：兼容用户输入 'gpu' 的情况
+    device_str = "cuda" if args.device.lower() == "gpu" else args.device
+    config.device = torch.device(device_str)
+
+    # 3. 构建训练集、验证集和测试集
     print(f"Loading data for [{model_name.upper()}] on [{args.dataset}] dataset...")
     train_data, dev_data, test_data = build_dataset(config)
     train_iter = build_iterator(train_data, config)
     dev_iter = build_iterator(dev_data, config)
     test_iter = build_iterator(test_data, config)
 
-    # 4. 初始化模型并迁移至目标设备 (GPU / CPU)
+    # 4. 初始化模型并迁移至目标设备
     model = model_module.Model(config).to(config.device)
 
-    # 5. 启动训练与最终测试
+    # 5. 启动训练与验证
+    print(f"Starting training on device: {config.device}...")
     train(config, model, train_iter, dev_iter)
+
+    # 6. 加载训练产出的最佳权重进行最终基准测试（对应 bert.pt）
+    model.load_state_dict(torch.load(config.save_path, map_location=config.device))
+    model.eval()
     test(config, model, test_iter)
 
 
