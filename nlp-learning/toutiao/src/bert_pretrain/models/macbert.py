@@ -34,7 +34,7 @@ class Config:
         self.num_classes = len(self.class_list)
 
         # 2. 模型保存路径
-        self.save_dir = os.path.join(project_root, "model_bin")
+        self.save_dir = os.path.join(project_root, "save_dict")
         # os.makedirs 支持递归创建多级目录，exist_ok=True 避免并发或已存在时崩溃
         os.makedirs(self.save_dir, exist_ok=True)
         self.save_path = os.path.join(self.save_dir, self.model_name + ".pt")

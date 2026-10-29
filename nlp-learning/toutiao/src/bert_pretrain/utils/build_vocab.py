@@ -4,7 +4,7 @@ from collections.abc import Callable
 from tqdm import tqdm
 
 
-def build_vocab(
+def build_vocab_CNN(
         file_path: str, 
         tokenizer: Callable[[str], list[str]], 
         max_size: int=10000, 

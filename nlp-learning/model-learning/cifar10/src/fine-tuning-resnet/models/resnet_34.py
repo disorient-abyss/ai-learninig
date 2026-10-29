@@ -33,8 +33,8 @@ class Config:
         # 3. 硬件环境与训练超参数
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.num_epochs = 8
-        self.batch_size = 128
-        self.learning_rate = 1e-4
+        self.batch_size = 256
+        self.learning_rate = 5e-5
 
         # 4. 模型结构参数（ResNet-34 最终输出维度为 512，CIFAR-10 为 10 类）
         self.hidden_size = 512

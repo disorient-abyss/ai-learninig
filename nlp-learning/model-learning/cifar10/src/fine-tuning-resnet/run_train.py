@@ -12,7 +12,7 @@ if str(CURRENT_DIR) not in sys.path:
     sys.path.append(str(CURRENT_DIR))
 
 from utils.build_dataset import build_dataset
-from utils.train_eval import test, train
+from utils.train_eval import train
 
 
 def parse_args():
@@ -29,11 +29,8 @@ def parse_args():
 
 def main():
     args = parse_args()
-
-    # 规范化模型名称：将中划线替换为下划线以匹配文件名
     model_name = args.model.replace("-", "_")
 
-    # 动态导入 models 目录下的对应模块
     try:
         model_module = importlib.import_module(f"models.{model_name}")
     except ModuleNotFoundError:
@@ -55,8 +52,10 @@ def main():
     print(f"Model selected: {config.model_name}")
     print(f"Batch size: {config.batch_size} | Epochs: {config.num_epochs}")
 
-    # 构建数据集与 DataLoader
-    train_dataset, test_dataset = build_dataset(config)
+    # 1. 拆分并获取训练集、验证集、测试集
+    train_dataset, dev_dataset, test_dataset = build_dataset(config)
+
+    # 2. 构造数据迭代器
     train_loader = DataLoader(
         train_dataset,
         batch_size=config.batch_size,
@@ -65,6 +64,14 @@ def main():
         pin_memory=True,
         persistent_workers=True,
         drop_last=True,
+    )
+    dev_loader = DataLoader(
+        dev_dataset,
+        batch_size=config.batch_size,
+        shuffle=False,
+        num_workers=8,
+        pin_memory=True,
+        persistent_workers=True,
     )
     test_loader = DataLoader(
         test_dataset,
@@ -75,14 +82,14 @@ def main():
         persistent_workers=True,
     )
 
+    print(f"Train samples: {len(train_dataset)}, Dev samples: {len(dev_dataset)}, Test samples: {len(test_dataset)}")
+
     print("Initializing model...")
     model = Model(config).to(config.device)
 
     print("Start training...")
-    train(config, model, train_loader)
-
-    print("\nRunning final evaluation on test set...")
-    test(config, model, test_loader)
+    # 传入 dev_loader 进行每 200 batch 评估，同时传入 test_loader 实现训练后自动测试
+    train(config, model, train_loader, dev_loader, test_loader)
 
 
 if __name__ == "__main__":
