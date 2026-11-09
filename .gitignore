@@ -1,30 +1,53 @@
+# 编辑器与环境
 *.code-workspace
-.vscode
-.gitignore
+.vscode/
 __pycache__/
 *.pyc
+
+# 模型与大权重文件（深度忽略）
 *.pth
 *.pt
 *.bin
+*.safetensors
 fil9
 fil9.bin
 
-# 忽略任何层级下的 data 文件及其内部所有内容
+# 忽略微调与输出权重目录（去掉了双引号）
+**/saves/
+**/checkpoints/
+
+# 忽略大型依赖与子模块目录（支持任何嵌套层级）
+**/models/
+**/LLaMA-Factory/
+
+# 数据集目录
 **/data/
 **/data/**
 
-# 忽略任何层级下的 keys 文件夹及其内部所有内容
+# 密钥与敏感配置
 **/keys/
 keys/
-
-# 忽略常见以 _key.txt 或 key.txt 结尾的密钥明文
 *key.txt
 *_key.txt
 *token.txt
-
-# 忽略通用环境配置与敏感凭据文件
 .env
 .env.*
 *.pem
 *.key
 *.cert
+
+# 忽略任何深度下的 models 与权重缓存
+**/models/
+**/snapshots/
+*.safetensors
+*.bin
+*.pt
+*.pth
+
+# 忽略微调产物与保存目录
+**/saves/
+**/checkpoint*/
+
+# 忽略大型第三方子工程
+**/LLaMA-Factory/
+**/zero-shot/data/
